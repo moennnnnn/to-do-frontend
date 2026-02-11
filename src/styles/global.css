@@ -1,0 +1,29 @@
+/* Splash Screen effect */
+.splash-screen {
+  height: 100vh;
+  background: linear-gradient(180deg, #6fa3d8, #2b6cb0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 1;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.splash-screen.fade-out {
+  opacity: 0;
+}
+
+/* Landing Page */
+.landing-page {
+  height: 100vh;
+  background: linear-gradient(180deg, #6fa3d8, #2b6cb0);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  border-radius: 30px;
+}
+
