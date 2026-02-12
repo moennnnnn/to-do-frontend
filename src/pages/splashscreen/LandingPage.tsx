@@ -7,8 +7,8 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page">
-      <div className="relative">
-        <img src={AppLogo} alt="app-logo" className="absolute inset-x-0 top-0"/>
+      <div className="flex flex-col items-center mb-38">
+        <img src={AppLogo} alt="app-logo"/>
       </div>
 
       <button
