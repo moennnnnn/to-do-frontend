@@ -14,16 +14,57 @@
   opacity: 0;
 }
 
-/* Landing Page */
+@keyframes logoFadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-logo {
+  animation: logoFadeInUp 0.8s ease forwards;
+}
+
+/* Landing page */
 .landing-page {
   height: 100vh;
-  background: linear-gradient(180deg, #6fa3d8, #2b6cb0);
+  width: 100vw;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+
   border-radius: 30px;
+
+  /* Base gradient */
+  background: linear-gradient(135deg, #7fb2e5 0%, #4f87c2 40%, #2b6cb0 100%);
+
+  position: relative;
 }
 
+/* Soft light overlay effect */
+.landing-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    transparent 70%
+  );
+
+  pointer-events: none;
+}
+
+@keyframes fadeInPage {
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeInPage 0.7s ease forwards;
+}

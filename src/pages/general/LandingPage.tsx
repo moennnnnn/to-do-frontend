@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import "@/styles/global.css";
-import AppLogo from "@/assets/AppLogo.png"
+import AppLogo from "@/assets/AppLogo.png";
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="landing-page">
+    <div className="landing-page opacity-0 animate-fadeIn">
       <div className="flex flex-col items-center mb-38">
-        <img src={AppLogo} alt="app-logo"/>
+        <img src={AppLogo} alt="app-logo" />
       </div>
 
       <button
