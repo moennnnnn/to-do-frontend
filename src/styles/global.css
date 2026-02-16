@@ -35,8 +35,6 @@
   justify-content: center;
   align-items: center;
 
-  border-radius: 30px;
-
   /* Base gradient */
   background: linear-gradient(135deg, #7fb2e5 0%, #4f87c2 40%, #2b6cb0 100%);
 

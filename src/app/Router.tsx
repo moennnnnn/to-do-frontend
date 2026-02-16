@@ -12,19 +12,19 @@ import InProgress from "../pages/todo/InProgress";
 import Completed from "../pages/todo/Completed";
 
 const router = createBrowserRouter([
-    { path: "/", Component: SplashScreen},
-    { path: "/landing", Component: LandingPage},
+  { path: "/", Component: SplashScreen },
+  { path: "/landing", Component: LandingPage },
 
-    { path: "/login", Component: Login},
-    { path: "/signup", Component: SignUp},
-    { path: "/forgot-password", Component: ForgotPassword},
-    
-    { path: "/verify-email", Component: EmailVerification},
-    { path: "/verify-code", Component: CodeVerification},
+  { path: "/login", Component: Login },
+  { path: "/register", Component: SignUp },
+  { path: "/forgot-password", Component: ForgotPassword },
 
-    { path: "/home", Component: Home},
-    { path: "/in-progress", Component: InProgress},
-    { path: "/completed", Component: Completed},
+  { path: "/verify-email", Component: EmailVerification },
+  { path: "/verify-code", Component: CodeVerification },
+
+  { path: "/home", Component: Home },
+  { path: "/in-progress", Component: InProgress },
+  { path: "/completed", Component: Completed },
 ]);
 
 export default router;

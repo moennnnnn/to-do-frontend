@@ -1,52 +1,125 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLogo from "@/assets/AppLogo.png";
-import { FiPlus, FiEdit } from "react-icons/fi";
+import { FiPlus, FiEdit, FiX } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import toast from "react-hot-toast";
+
+type Status = "IN_PROGRESS" | "COMPLETED";
+type Filter = "ALL" | Status;
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: Status;
+  dueDate: string;
+  completedAt?: string;
+}
 
 export default function Home() {
   const navigate = useNavigate();
 
-  const [filter, setFilter] = useState<"ALL" | "IN_PROGRESS" | "COMPLETED">("ALL");
+  const [filter, setFilter] = useState<Filter>("ALL");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const filteredTasks =
+    filter === "ALL" ? tasks : tasks.filter((t) => t.status === filter);
+
+  const openAddModal = () => {
+    setIsEditMode(false);
+    setCurrentTask({
+      id: Date.now(),
+      title: "",
+      description: "",
+      status: "IN_PROGRESS",
+      dueDate: "",
+    });
+    setIsTaskModalOpen(true);
+  };
+
+  const openEditModal = (task: Task) => {
+    setIsEditMode(true);
+    setCurrentTask(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const saveTask = () => {
+    if (!currentTask) return;
+
+    if (isEditMode) {
+      setTasks((prev) =>
+        prev.map((t) => (t.id === currentTask.id ? currentTask : t)),
+      );
+      toast.success("Task updated successfully!");
+    } else {
+      setTasks((prev) => [...prev, currentTask]);
+      toast.success("Task added successfully!");
+    }
+
+    setIsTaskModalOpen(false);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const markCompleted = (id: number) => {
+    toast.success("Task marked as completed!");
+    const today = new Date().toISOString();
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, status: "COMPLETED", completedAt: today } : t,
+      ),
+    );
+  };
+
+  const confirmDelete = () => {
+    toast.success("Task deleted successfully!");
+    if (taskToDelete === null) return;
+    setTasks((prev) => prev.filter((t) => t.id !== taskToDelete));
+    setIsDeleteModalOpen(false);
+  };
+
   const handleLogout = () => {
-    // Later: clear token / store
+    toast.success("Logged out.");
     navigate("/login");
   };
 
-  const tasks = [
-    { id: 1, title: "Task 1", description: "Do laundry", status: "IN_PROGRESS" },
-    { id: 2, title: "Task 2", description: "Do laundry", status: "COMPLETED" },
-    { id: 3, title: "Task 3", description: "Do laundry", status: "IN_PROGRESS" },
-  ];
-
-  const filteredTasks =
-    filter === "ALL"
-      ? tasks
-      : tasks.filter((t) => t.status === filter);
-
   return (
-    <div className="min-h-screen px-4 py-6
-      bg-linear-to-br from-[#7fb2e5] via-[#4f87c2] to-[#2b6cb0]">
-
+    <div className="min-h-screen px-4 py-6 font-[Lexend] bg-linear-to-br from-[#7fb2e5] via-[#4f87c2] to-[#2b6cb0]">
       {/* Header */}
       <div className="bg-white rounded-2xl p-4 flex justify-between items-center relative">
-
         <img src={AppLogo} alt="logo" className="w-20" />
 
         <div className="text-center">
@@ -54,28 +127,22 @@ export default function Home() {
           <p className="font-semibold text-lg">User 123</p>
         </div>
 
-        {/* Profile Avatar */}
         <div className="relative" ref={dropdownRef}>
           <div
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="w-10 h-10 rounded-full bg-yellow-400 cursor-pointer"
           />
 
-          {/* Dropdown */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg text-sm">
-              <button
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                 Profile
               </button>
-              <button
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
+              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                 Settings
               </button>
               <button
-                onClick={handleLogout}
+                onClick={() => setIsLogoutModalOpen(true)}
                 className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
               >
                 Logout
@@ -87,34 +154,28 @@ export default function Home() {
 
       {/* Filters */}
       <div className="flex gap-2 mt-6">
-        <button
-          onClick={() => setFilter("ALL")}
-          className={`px-4 py-2 rounded-md text-sm shadow
-            ${filter === "ALL" ? "bg-[#1C4D8D] text-white" : "bg-white text-[#1C4D8D]"}`}
-        >
-          All Tasks
-        </button>
-
-        <button
-          onClick={() => setFilter("IN_PROGRESS")}
-          className={`px-4 py-2 rounded-md text-sm shadow
-            ${filter === "IN_PROGRESS" ? "bg-[#1C4D8D] text-white" : "bg-white text-[#1C4D8D]"}`}
-        >
-          In progress
-        </button>
-
-        <button
-          onClick={() => setFilter("COMPLETED")}
-          className={`px-4 py-2 rounded-md text-sm shadow
-            ${filter === "COMPLETED" ? "bg-[#1C4D8D] text-white" : "bg-white text-[#1C4D8D]"}`}
-        >
-          Completed
-        </button>
+        {["ALL", "IN_PROGRESS", "COMPLETED"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f as Filter)}
+            className={`px-4 py-2 rounded-md text-sm shadow
+              ${filter === f ? "bg-[#1C4D8D] text-white" : "bg-white text-[#1C4D8D]"}`}
+          >
+            {f === "ALL"
+              ? "All Tasks"
+              : f === "IN_PROGRESS"
+                ? "In progress"
+                : "Completed"}
+          </button>
+        ))}
       </div>
 
-      {/* Add Task Button */}
+      {/* Add Task */}
       <div className="flex justify-end mt-4">
-        <button className="flex items-center gap-2 bg-[#1C4D8D] text-white px-4 py-2 rounded-md shadow">
+        <button
+          onClick={openAddModal}
+          className="flex items-center gap-2 bg-[#1C4D8D] text-white px-4 py-2 rounded-md shadow"
+        >
           <FiPlus />
           Add task
         </button>
@@ -123,10 +184,16 @@ export default function Home() {
       {/* Task List */}
       <div className="mt-6 space-y-4">
         {filteredTasks.map((task) => (
-          <div key={task.id} className="bg-white rounded-xl p-4 shadow relative">
-
-            {/* Edit icon */}
-            <FiEdit className="absolute top-3 right-3 text-gray-600 cursor-pointer" />
+          <div
+            key={task.id}
+            className="bg-white rounded-xl p-4 shadow relative"
+          >
+            {task.status !== "COMPLETED" && (
+              <FiEdit
+                onClick={() => openEditModal(task)}
+                className="absolute top-3 right-3 text-gray-600 cursor-pointer"
+              />
+            )}
 
             <p className="font-semibold">{task.title}</p>
 
@@ -134,21 +201,189 @@ export default function Home() {
               {task.description}
             </div>
 
-            <div className="flex justify-between items-center mt-3">
-              <RiDeleteBin6Line className="text-red-500 cursor-pointer" />
+            <div className="text-xs text-gray-500 mt-2">
+              Due: {task.dueDate ? formatDate(task.dueDate) : "No date"}
+            </div>
 
-              <div className="flex gap-2 text-xs">
-                <span className="bg-gray-200 px-3 py-1 rounded-full">
-                  In progress
-                </span>
-                <span className="bg-gray-200 px-3 py-1 rounded-full">
-                  Completed
-                </span>
+            {task.status === "COMPLETED" && task.completedAt && (
+              <div className="text-xs text-green-600 mt-1">
+                Completed at {formatDate(task.completedAt)}
               </div>
+            )}
+
+            <div className="flex justify-between items-center mt-3">
+              <RiDeleteBin6Line
+                onClick={() => {
+                  setTaskToDelete(task.id);
+                  setIsDeleteModalOpen(true);
+                }}
+                className="text-red-500 cursor-pointer"
+              />
+
+              {filter === "IN_PROGRESS" && task.status === "IN_PROGRESS" && (
+                <button
+                  onClick={() => markCompleted(task.id)}
+                  className="bg-gray-200 px-3 py-1 rounded-full text-xs"
+                >
+                  Mark as Completed
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Add/Edit Modal */}
+      {isTaskModalOpen && currentTask && (
+        <div
+          onClick={() => {
+            setIsTaskModalOpen(false);
+            setIsDeleteModalOpen(false);
+            setIsLogoutModalOpen(false);
+          }}
+          className="fixed inset-0 bg-black/40 flex items-center justify-center font-[Lexend]"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xl p-6 w-80 space-y-4 relative"
+          >
+            <button
+              onClick={() => {
+                setIsTaskModalOpen(false);
+                setIsDeleteModalOpen(false);
+                setIsLogoutModalOpen(false);
+              }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            >
+              <FiX size={18} />
+            </button>
+            <h2 className="font-semibold text-lg">
+              {isEditMode ? "Edit Task" : "Add Task"}
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Title"
+              value={currentTask.title}
+              onChange={(e) =>
+                setCurrentTask({ ...currentTask, title: e.target.value })
+              }
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+
+            <textarea
+              placeholder="Description"
+              value={currentTask.description}
+              onChange={(e) =>
+                setCurrentTask({ ...currentTask, description: e.target.value })
+              }
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+
+            <input
+              type="date"
+              value={currentTask.dueDate}
+              onChange={(e) =>
+                setCurrentTask({ ...currentTask, dueDate: e.target.value })
+              }
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+
+            <button
+              onClick={saveTask}
+              className="w-full bg-[#1C4D8D] text-white py-2 rounded-md"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {isDeleteModalOpen && (
+        <div
+          onClick={() => {
+            setIsTaskModalOpen(false);
+            setIsDeleteModalOpen(false);
+            setIsLogoutModalOpen(false);
+          }}
+          className="fixed inset-0 bg-black/40 flex items-center justify-center font-[Lexend]"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xl p-6 w-80 space-y-4 relative"
+          >
+            <button
+              onClick={() => {
+                setIsTaskModalOpen(false);
+                setIsDeleteModalOpen(false);
+                setIsLogoutModalOpen(false);
+              }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            >
+              <FiX size={18} />
+            </button>
+            <p>Are you sure you want to delete this task?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-200 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded-md"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Modal */}
+      {isLogoutModalOpen && (
+        <div
+          onClick={() => {
+            setIsTaskModalOpen(false);
+            setIsDeleteModalOpen(false);
+            setIsLogoutModalOpen(false);
+          }}
+          className="fixed inset-0 bg-black/40 flex items-center justify-center font-[Lexend]"
+        >
+          <button
+            onClick={() => {
+              setIsTaskModalOpen(false);
+              setIsDeleteModalOpen(false);
+              setIsLogoutModalOpen(false);
+            }}
+            className="absolute top-3 right-3 text-gray-500 hover:text-black"
+          >
+            <FiX size={18} />
+          </button>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xl p-6 w-80 space-y-4 relative"
+          >
+            <p>Are you sure you want to logout?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="px-4 py-2 bg-gray-200 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-md"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

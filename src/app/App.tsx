@@ -7,6 +7,7 @@ import CodeVerification from "@/pages/auth/CodeVerification";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import Home from "@/pages/todo/Home";
 import SplashScreen from "@/pages/general/SplashScreen";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,10 +25,14 @@ function App() {
 
     { path: "/forgotpassword", Component: ForgotPassword },
 
-    { path: "/home", Component: Home},
-
+    { path: "/home", Component: Home },
   ]);
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <Toaster position="top-center" />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

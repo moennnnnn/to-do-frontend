@@ -23,14 +23,14 @@ function Login() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const submitForm = async (e: SubmitEvent) => {
+  const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form: ", form);
     const success = await setLogin(form);
     if (success) {
       navigate("/home");
     }
   };
+
   return (
     <div className="landing-page relative overflow-hidden">
       {/* White curved top */}
@@ -103,7 +103,7 @@ function Login() {
         {/* Login */}
         <button
           type="submit"
-          className="text-white bg-[#1C4D8D] w-24 h-8 rounded-sm text items-center font-[Lexend]"
+          className="w-28 h-9 rounded-md font-medium transition bg-[#1C4D8D]"
         >
           {loading ? "Loading..." : "Login"}
         </button>
@@ -112,7 +112,6 @@ function Login() {
         <div className="text-white font-[Lexend] text-sm">
           Don't have an account?{" "}
           <Link to="/signup" className="underline text-amber-300">
-            {" "}
             Sign Up.
           </Link>
         </div>
