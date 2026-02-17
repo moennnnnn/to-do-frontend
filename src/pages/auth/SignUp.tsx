@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoIosLock, IoMdMail } from "react-icons/io";
+import { IoIosEye, IoIosEyeOff, IoIosLock, IoMdMail } from "react-icons/io";
 import { IoPerson } from "react-icons/io5";
 import SignUpLogo from "@/assets/SignUpLogo.png";
 import { useAuthStore } from "@/stores/auth.store";
@@ -11,6 +11,8 @@ function SignUp() {
   const navigate = useNavigate();
 
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { setRegister, loading } = useAuthStore();
 
@@ -41,11 +43,6 @@ function SignUp() {
       return;
     }
 
-    if (!form.agree) {
-      toast.error("You must agree to the Terms and Conditions.");
-      return;
-    }
-
     const success = await setRegister({
       firstName: form.firstName,
       lastName: form.lastName,
@@ -53,6 +50,7 @@ function SignUp() {
       username: form.username,
       password: form.password,
       confirmPassword: form.confirmPassword,
+      agree: form.agree,
     });
     if (success) {
       navigate("/login");
@@ -80,7 +78,7 @@ function SignUp() {
         <div className="flex items-center bg-white rounded-md px-3 py-2 mb-3 border-double outline-1 outline-black">
           <IoPerson className="text-gray-600 mr-2" />
           <input
-            type="firstName"
+            type="text"
             name="firstName"
             value={form.firstName}
             onChange={handleChange}
@@ -94,7 +92,7 @@ function SignUp() {
         <div className="flex items-center bg-white rounded-md px-3 py-2 mb-3 border-double outline-1 outline-black">
           <IoPerson className="text-gray-600 mr-2" />
           <input
-            type="lastName"
+            type="text"
             name="lastName"
             value={form.lastName}
             onChange={handleChange}
@@ -135,28 +133,46 @@ function SignUp() {
         <label className="block mb-1">Password</label>
         <div className="flex items-center bg-white rounded-md px-3 py-2 mb-3 border-double outline-1 outline-black">
           <IoIosLock className="text-gray-600 mr-2" />
+
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={form.password}
             onChange={handleChange}
             placeholder="Enter your password..."
             className="w-full text-gray-700 outline-none text-sm"
           />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="text-gray-600 ml-2"
+          >
+            {showPassword ? <IoIosEyeOff /> : <IoIosEye />}
+          </button>
         </div>
 
         {/* Confirm Password */}
         <label className="block mb-1">Confirm Password</label>
         <div className="flex items-center bg-white rounded-md px-3 py-2 mb-3 border-double outline-1 outline-black">
           <IoIosLock className="text-gray-600 mr-2" />
+
           <input
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             name="confirmPassword"
             value={form.confirmPassword}
             onChange={handleChange}
             placeholder="Confirm your password..."
             className="w-full text-gray-700 outline-none text-sm"
           />
+
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword((prev) => !prev)}
+            className="text-gray-600 ml-2"
+          >
+            {showConfirmPassword ? <IoIosEyeOff /> : <IoIosEye />}
+          </button>
         </div>
 
         {/* Terms */}

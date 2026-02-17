@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AppLogo from "@/assets/AppLogo.png";
+import AppName from "@/assets/AppName.png";
 import { FiPlus, FiEdit, FiX } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import toast from "react-hot-toast";
@@ -14,6 +14,8 @@ interface Task {
   description: string;
   status: Status;
   dueDate: string;
+  dueTime: string;
+  createdAt: string;
   completedAt?: string;
 }
 
@@ -60,6 +62,8 @@ export default function Home() {
       description: "",
       status: "IN_PROGRESS",
       dueDate: "",
+      dueTime: "",
+      createdAt: new Date().toISOString(),
     });
     setIsTaskModalOpen(true);
   };
@@ -86,11 +90,13 @@ export default function Home() {
     setIsTaskModalOpen(false);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "2-digit",
       year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -116,15 +122,17 @@ export default function Home() {
     navigate("/login");
   };
 
+  const today = new Date().toISOString().split("T")[0];
+
   return (
-    <div className="min-h-screen px-4 py-6 font-[Lexend] bg-linear-to-br from-[#7fb2e5] via-[#4f87c2] to-[#2b6cb0]">
+    <div className="min-h-screen px-4 py-6 font-[Lexend] bg-linear-to-br from-[#7fb2e5] via-[#4f87c2] to-[#2b6cb0] flex flex-col">
       {/* Header */}
       <div className="bg-white rounded-2xl p-4 flex justify-between items-center relative">
-        <img src={AppLogo} alt="logo" className="w-20" />
+        <img src={AppName} alt="logo" className="w-20" />
 
-        <div className="text-center">
-          <p className="text-xs text-gray-500">Welcome!</p>
-          <p className="font-semibold text-lg">User 123</p>
+        <div className="text-center ml-20">
+          <p className="text-sm text-gray-500">Welcome!</p>
+          <p className="font-semibold text-2xl">User 123</p>
         </div>
 
         <div className="relative" ref={dropdownRef}>
@@ -182,12 +190,23 @@ export default function Home() {
       </div>
 
       {/* Task List */}
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 flex-1 overflow-y-auto space-y-4 pr-2">
         {filteredTasks.map((task) => (
           <div
             key={task.id}
             className="bg-white rounded-xl p-4 shadow relative"
           >
+            <div className="flex items-center gap-2 mt-1 mb-2">
+              <span
+                className={`text-xs px-2 py-1 rounded-full ${
+                  task.status === "IN_PROGRESS"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : " bg-green-100 text-green-500"
+                }`}
+              >
+                {task.status === "IN_PROGRESS" ? "In Progress" : "Completed"}
+              </span>
+            </div>
             {task.status !== "COMPLETED" && (
               <FiEdit
                 onClick={() => openEditModal(task)}
@@ -202,12 +221,19 @@ export default function Home() {
             </div>
 
             <div className="text-xs text-gray-500 mt-2">
-              Due: {task.dueDate ? formatDate(task.dueDate) : "No date"}
+              Created: {formatDateTime(task.createdAt)}
+            </div>
+
+            <div className="text-xs text-gray-500">
+              Due:{" "}
+              {task.dueDate
+                ? `${formatDateTime(task.dueDate)} ${task.dueTime || ""}`
+                : "No date"}
             </div>
 
             {task.status === "COMPLETED" && task.completedAt && (
               <div className="text-xs text-green-600 mt-1">
-                Completed at {formatDate(task.completedAt)}
+                Completed at {formatDateTime(task.completedAt)}
               </div>
             )}
 
@@ -282,9 +308,19 @@ export default function Home() {
 
             <input
               type="date"
+              min={today}
               value={currentTask.dueDate}
               onChange={(e) =>
                 setCurrentTask({ ...currentTask, dueDate: e.target.value })
+              }
+              className="w-full border rounded-md px-3 py-2 text-sm"
+            />
+
+            <input
+              type="time"
+              value={currentTask.dueTime}
+              onChange={(e) =>
+                setCurrentTask({ ...currentTask, dueTime: e.target.value })
               }
               className="w-full border rounded-md px-3 py-2 text-sm"
             />

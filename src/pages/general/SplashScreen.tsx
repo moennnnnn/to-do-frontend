@@ -26,7 +26,7 @@ function SplashScreen() {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center rounded-3xl overflow-hidden
+      className={`landing-page min-h-screen flex items-center justify-center overflow-hidden
       bg-linear-to-br from-[#7fb2e5] via-[#4f87c2] to-[#2b6cb0]
       transition-opacity duration-700
       ${fadeOut ? "opacity-0" : "opacity-100"}`}

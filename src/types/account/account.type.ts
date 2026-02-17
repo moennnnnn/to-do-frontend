@@ -5,4 +5,5 @@ export type AccountType = {
   email: string;
   password: string;
   confirmPassword: string;
+  agree: boolean;
 };

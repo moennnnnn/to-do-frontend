@@ -2,7 +2,7 @@ import "@/styles/global.css";
 import AppLogo from "@/assets/AppLogo.png";
 import LoginLogo from "@/assets/LoginLogo.png";
 import { IoPerson } from "react-icons/io5";
-import { IoIosLock } from "react-icons/io";
+import { IoIosEye, IoIosEyeOff, IoIosLock } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store";
 import type { AccountType } from "@/types/account/account.type";
@@ -11,6 +11,7 @@ import { useState, type ChangeEvent } from "react";
 function Login() {
   const navigate = useNavigate();
   const { loading, setLogin } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState<Partial<AccountType>>({
     username: "",
@@ -68,19 +69,26 @@ function Login() {
           </div>
 
           {/* Password */}
-          <label className="block text-sm mb-1 font-[Lexend]">Password</label>
-          <div className="border-double outline-1 outline-black w-90 h-8 flex items-center bg-white rounded-md px-3 py-2 ">
-            <span className="text-gray-600 mr-2">
-              <IoIosLock />
-            </span>
+          <label className="block mb-1">Password</label>
+          <div className="flex items-center bg-white rounded-md px-3 py-2 mb-3 border-double outline-1 outline-black">
+            <IoIosLock className="text-gray-600 mr-2" />
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={form.password}
               onChange={handleChange}
               placeholder="Enter your password..."
-              className="w-full text-gray-700 outline-none font-[Lexend]"
+              className="w-full text-gray-700 outline-none text-sm"
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="text-gray-600 ml-2"
+            >
+              {showPassword ? <IoIosEyeOff /> : <IoIosEye />}
+            </button>
           </div>
         </div>
 
