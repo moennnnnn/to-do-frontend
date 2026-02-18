@@ -69,7 +69,7 @@ function Login() {
           </div>
 
           {/* Password */}
-          <label className="block mb-1">Password</label>
+          <label className="block text-sm mb-1 font-[Lexend]">Password</label>
           <div className="flex items-center bg-white rounded-md px-3 py-2 mb-3 border-double outline-1 outline-black">
             <IoIosLock className="text-gray-600 mr-2" />
 
@@ -79,7 +79,7 @@ function Login() {
               value={form.password}
               onChange={handleChange}
               placeholder="Enter your password..."
-              className="w-full text-gray-700 outline-none text-sm"
+              className="w-full text-gray-700 outline-none font-[Lexend]"
             />
 
             <button
