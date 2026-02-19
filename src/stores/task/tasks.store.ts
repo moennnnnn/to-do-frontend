@@ -56,7 +56,7 @@ export const useTaskStore = create(
         set({ actionLoading: true, error: null });
         try {
           const response = await addTaskApi(data);
-          const newTask: TaskType = response.newTask;
+          const newTask: TaskType = response.data;
 
           set((prev) => ({
             tasks: [newTask, ...prev.tasks],
@@ -77,7 +77,7 @@ export const useTaskStore = create(
         set({ actionLoading: true, error: null });
         try {
           const response = await updateTaskApi(id, data);
-          const updated: TaskType = response.updatedTask ?? response.task;
+          const updated: TaskType = response.data;
 
           set((prev) => ({
             tasks: prev.tasks.map((t) => (t._id === id ? updated : t)),
@@ -98,12 +98,13 @@ export const useTaskStore = create(
         set({ actionLoading: true, error: null });
         try {
           const response = await updateTaskStatusApi(id, "COMPLETED");
-          const updated: TaskType = response.updatedTask ?? response.task;
+          const updated: TaskType = response.data;
 
           set((prev) => ({
             tasks: prev.tasks.map((t) => (t._id === id ? updated : t)),
           }));
 
+          toast.success(response.message);
           return true;
         } catch (error) {
           showError(error);

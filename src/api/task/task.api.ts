@@ -1,7 +1,7 @@
 import axiosInstance from "@/axios/axios-instance";
 
 export const getTasksApi = async (page: number = 0, limit: number = 15) => {
-  const response = await axiosInstance.get("/task/all", {
+  const response = await axiosInstance.get("/task/home", {
     params: { page, limit },
   });
   return response.data;

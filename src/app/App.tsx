@@ -8,6 +8,22 @@ import ForgotPassword from "@/pages/auth/ForgotPassword";
 import Home from "@/pages/todo/Home";
 import SplashScreen from "@/pages/general/SplashScreen";
 import { Toaster } from "react-hot-toast";
+import { useEffect, useState } from "react";
+import { useTokenStore } from "@/stores/token/token.store";
+
+
+function AppInitializer({ children }: { children: React.ReactNode }) {
+  const [ready, setReady] = useState(false);
+  const init = useTokenStore((s) => s.init);
+
+  useEffect(() => {
+    init().finally(() => setReady(true));
+  }, [init]);
+
+  if (!ready) return null; // or a loading spinner
+
+  return <>{children}</>;
+}
 
 function App() {
   const router = createBrowserRouter([
@@ -28,11 +44,10 @@ function App() {
     { path: "/home", Component: Home },
   ]);
   return (
-    <>
+   <AppInitializer>
       <Toaster position="top-center" />
       <RouterProvider router={router} />
-    </>
-    
+    </AppInitializer>
   );
 }
 

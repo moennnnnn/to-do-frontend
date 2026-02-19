@@ -6,6 +6,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import toast from "react-hot-toast";
 import { useTaskStore } from "@/stores/task/tasks.store";
 import type { TaskType } from "@/types/task/task.type";
+import { useAccountStore } from "@/stores/account/account.store";
+import { FaUserCircle } from "react-icons/fa";
 
 type Status = "IN_PROGRESS" | "COMPLETED";
 type Filter = "ALL" | Status;
@@ -23,6 +25,13 @@ export default function Home() {
   useEffect(() => {
     getTasks();
   }, [getTasks]);
+
+  const { account, getAccount } = useAccountStore();
+
+  useEffect(() => {
+    if (!account) getAccount();
+  }, []);
+
 
   const navigate = useNavigate();
 
@@ -134,23 +143,17 @@ export default function Home() {
 
         <div className="text-center ml-20">
           <p className="text-sm text-gray-500">Welcome!</p>
-          <p className="font-semibold text-2xl">User 123</p>
-        </div>
+          <p className="font-semibold text-2xl">
+            {account ? `${account.firstName} ${account.lastName}` : "..."}
+          </p>        </div>
 
         <div className="relative" ref={dropdownRef}>
-          <div
+          <FaUserCircle
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-10 h-10 rounded-full bg-yellow-400 cursor-pointer"
+            className="text-[#1C4D8D] text-4xl cursor-pointer"
           />
-
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg text-sm">
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                Profile
-              </button>
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-                Settings
-              </button>
               <button
                 onClick={() => setIsLogoutModalOpen(true)}
                 className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
@@ -200,11 +203,10 @@ export default function Home() {
           >
             <div className="flex items-center gap-2 mt-1 mb-2">
               <span
-                className={`text-xs px-2 py-1 rounded-full ${
-                  task.status === "IN_PROGRESS"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : " bg-green-100 text-green-500"
-                }`}
+                className={`text-xs px-2 py-1 rounded-full ${task.status === "IN_PROGRESS"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : " bg-green-100 text-green-500"
+                  }`}
               >
                 {task.status === "IN_PROGRESS" ? "In Progress" : "Completed"}
               </span>

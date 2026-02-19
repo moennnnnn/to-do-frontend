@@ -3,6 +3,8 @@ import type { AuthStoreType } from "@/types/auth/auth.type";
 import { showError } from "@/utils/error/error.util";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { useAccountStore } from "../account/account.store";
+import { useTokenStore } from "../token/token.store";
 
 export const useAuthStore = create<AuthStoreType>((set) => ({
   loading: false,
@@ -21,9 +23,15 @@ export const useAuthStore = create<AuthStoreType>((set) => ({
   },
 
   setLogin: async (data) => {
-     set({ loading: true });
+    set({ loading: true });
     try {
       const response = await loginApi(data);
+
+      // Save the access token first
+      useTokenStore.getState().setToken(response.accessToken);
+
+      //fetch account after login
+      await useAccountStore.getState().getAccount();
       toast.success(response.message);
       return true;
     } catch (error) {
