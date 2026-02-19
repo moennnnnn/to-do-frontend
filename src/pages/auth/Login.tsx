@@ -4,7 +4,7 @@ import LoginLogo from "@/assets/LoginLogo.png";
 import { IoPerson } from "react-icons/io5";
 import { IoIosEye, IoIosEyeOff, IoIosLock } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@/stores/auth/auth.store";
 import type { AccountType } from "@/types/account/account.type";
 import { useState, type ChangeEvent } from "react";
 

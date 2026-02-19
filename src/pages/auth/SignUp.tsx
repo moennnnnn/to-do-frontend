@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IoIosEye, IoIosEyeOff, IoIosLock, IoMdMail } from "react-icons/io";
 import { IoPerson } from "react-icons/io5";
 import SignUpLogo from "@/assets/SignUpLogo.png";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@/stores/auth/auth.store";
 import { FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
 

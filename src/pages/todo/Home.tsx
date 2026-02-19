@@ -4,35 +4,37 @@ import AppName from "@/assets/AppName.png";
 import { FiPlus, FiEdit, FiX } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import toast from "react-hot-toast";
+import { useTaskStore } from "@/stores/task/tasks.store";
+import type { TaskType } from "@/types/task/task.type";
 
 type Status = "IN_PROGRESS" | "COMPLETED";
 type Filter = "ALL" | Status;
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: Status;
-  dueDate: string;
-  dueTime: string;
-  createdAt: string;
-  completedAt?: string;
-}
-
 export default function Home() {
+  const {
+    tasks,
+    getTasks,
+    addTask,
+    updateTask,
+    markTaskCompleted,
+    deleteTask,
+  } = useTaskStore();
+
+  useEffect(() => {
+    getTasks();
+  }, [getTasks]);
+
   const navigate = useNavigate();
 
   const [filter, setFilter] = useState<Filter>("ALL");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [currentTask, setCurrentTask] = useState<TaskType | null>(null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -57,7 +59,7 @@ export default function Home() {
   const openAddModal = () => {
     setIsEditMode(false);
     setCurrentTask({
-      id: Date.now(),
+      _id: "",
       title: "",
       description: "",
       status: "IN_PROGRESS",
@@ -68,23 +70,29 @@ export default function Home() {
     setIsTaskModalOpen(true);
   };
 
-  const openEditModal = (task: Task) => {
+  const openEditModal = (task: TaskType) => {
     setIsEditMode(true);
     setCurrentTask(task);
     setIsTaskModalOpen(true);
   };
 
-  const saveTask = () => {
+  const saveTask = async () => {
     if (!currentTask) return;
 
     if (isEditMode) {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === currentTask.id ? currentTask : t)),
-      );
-      toast.success("Task updated successfully!");
+      await updateTask(currentTask._id, {
+        title: currentTask.title,
+        description: currentTask.description,
+        dueDate: currentTask.dueDate,
+        dueTime: currentTask.dueTime,
+      });
     } else {
-      setTasks((prev) => [...prev, currentTask]);
-      toast.success("Task added successfully!");
+      await addTask({
+        title: currentTask.title,
+        description: currentTask.description,
+        dueDate: currentTask.dueDate,
+        dueTime: currentTask.dueTime,
+      });
     }
 
     setIsTaskModalOpen(false);
@@ -100,20 +108,14 @@ export default function Home() {
     });
   };
 
-  const markCompleted = (id: number) => {
-    toast.success("Task marked as completed!");
-    const today = new Date().toISOString();
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, status: "COMPLETED", completedAt: today } : t,
-      ),
-    );
+  const markCompleted = async (id: string) => {
+    await markTaskCompleted(id);
   };
 
-  const confirmDelete = () => {
-    toast.success("Task deleted successfully!");
-    if (taskToDelete === null) return;
-    setTasks((prev) => prev.filter((t) => t.id !== taskToDelete));
+  const confirmDelete = async () => {
+    if (!taskToDelete) return;
+
+    await deleteTask(taskToDelete);
     setIsDeleteModalOpen(false);
   };
 
@@ -193,7 +195,7 @@ export default function Home() {
       <div className="mt-6 flex-1 overflow-y-auto space-y-4 pr-2">
         {filteredTasks.map((task) => (
           <div
-            key={task.id}
+            key={task._id}
             className="bg-white rounded-xl p-4 shadow relative"
           >
             <div className="flex items-center gap-2 mt-1 mb-2">
@@ -240,7 +242,7 @@ export default function Home() {
             <div className="flex justify-between items-center mt-3">
               <RiDeleteBin6Line
                 onClick={() => {
-                  setTaskToDelete(task.id);
+                  setTaskToDelete(task._id);
                   setIsDeleteModalOpen(true);
                 }}
                 className="text-red-500 cursor-pointer"
@@ -248,7 +250,7 @@ export default function Home() {
 
               {filter === "IN_PROGRESS" && task.status === "IN_PROGRESS" && (
                 <button
-                  onClick={() => markCompleted(task.id)}
+                  onClick={() => markCompleted(task._id)}
                   className="bg-gray-200 px-3 py-1 rounded-full text-xs"
                 >
                   Mark as Completed

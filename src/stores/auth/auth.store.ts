@@ -1,5 +1,5 @@
 import { loginApi, logoutApi, registerApi } from "@/api/auth/auth.api";
-import type { AuthStoreType } from "@/types/auth/auth.types";
+import type { AuthStoreType } from "@/types/auth/auth.type";
 import { showError } from "@/utils/error/error.util";
 import toast from "react-hot-toast";
 import { create } from "zustand";
