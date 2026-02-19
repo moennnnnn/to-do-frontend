@@ -21,7 +21,7 @@ export const useAuthStore = create<AuthStoreType>((set) => ({
   },
 
   setLogin: async (data) => {
-    set({ loading: true });
+     set({ loading: true });
     try {
       const response = await loginApi(data);
       toast.success(response.message);

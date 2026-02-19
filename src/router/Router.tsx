@@ -8,8 +8,6 @@ import ForgotPassword from "../pages/auth/ForgotPassword";
 import EmailVerification from "../pages/auth/EmailVerification";
 import CodeVerification from "../pages/auth/CodeVerification";
 import Home from "../pages/todo/Home";
-import InProgress from "../pages/todo/InProgress";
-import Completed from "../pages/todo/Completed";
 
 const router = createBrowserRouter([
   { path: "/", Component: SplashScreen },
@@ -23,8 +21,7 @@ const router = createBrowserRouter([
   { path: "/verify-code", Component: CodeVerification },
 
   { path: "/home", Component: Home },
-  { path: "/in-progress", Component: InProgress },
-  { path: "/completed", Component: Completed },
+
 ]);
 
 export default router;

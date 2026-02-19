@@ -29,7 +29,7 @@ export const useTaskStore = create(
         set({ getLoading: true, error: null });
         try {
           const response = await getTasksApi();
-          set({ tasks: response.tasks || [] });
+          set({ tasks: response.data || [] });
         } catch (error) {
           showError(error);
           set({ error: "Failed to fetch tasks" });

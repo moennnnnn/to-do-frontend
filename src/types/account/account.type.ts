@@ -7,3 +7,10 @@ export type AccountType = {
   confirmPassword: string;
   agree: boolean;
 };
+
+export type AccountStoreType = {
+  account: AccountType | null;
+  loading: boolean;
+  getAccount: () => Promise<boolean>;
+  clearAccount: () => void;
+};
