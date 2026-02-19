@@ -30,8 +30,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!account) getAccount();
-  }, []);
-
+  }, [account, getAccount]);
 
   const navigate = useNavigate();
 
@@ -145,7 +144,8 @@ export default function Home() {
           <p className="text-sm text-gray-500">Welcome!</p>
           <p className="font-semibold text-2xl">
             {account ? `${account.firstName} ${account.lastName}` : "..."}
-          </p>        </div>
+          </p>{" "}
+        </div>
 
         <div className="relative" ref={dropdownRef}>
           <FaUserCircle
@@ -203,10 +203,11 @@ export default function Home() {
           >
             <div className="flex items-center gap-2 mt-1 mb-2">
               <span
-                className={`text-xs px-2 py-1 rounded-full ${task.status === "IN_PROGRESS"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : " bg-green-100 text-green-500"
-                  }`}
+                className={`text-xs px-2 py-1 rounded-full ${
+                  task.status === "IN_PROGRESS"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : " bg-green-100 text-green-500"
+                }`}
               >
                 {task.status === "IN_PROGRESS" ? "In Progress" : "Completed"}
               </span>
