@@ -53,7 +53,7 @@ function SignUp() {
       agree: form.agree,
     });
     if (success) {
-      navigate("/login");
+      navigate("/emailverificaiton", { state: { email: form.email } });
     }
   };
 
